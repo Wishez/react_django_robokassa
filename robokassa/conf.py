@@ -20,11 +20,15 @@ TEST_MODE = getattr(settings, 'ROBOKASSA_TEST_MODE', False)
 FORM_TARGET = u'https://merchant.roboxchange.com/Index.aspx'
 
 if TEST_MODE:
+    PASSWORD1 = settings.ROBOKASSA_TEST_PASSWORD1
+    PASSWORD2 = getattr(settings, 'ROBOKASSA__TEST_PASSWORD2', None)
     FORM_TARGET = getattr(
         settings, 
         'ROBOKASSA_TEST_FORM_TARGET', 
         u'https://auth.robokassa.ru/Merchant/Index.aspx'
     )
+SUCCESS_URL = getattr(settings, 'ROBOKASSA_SUCCESS_URL', '/payment/success')
+FAILURE_URL = getattr(settings, 'ROBOKASSA_FAILURE_URL', '/payment/failure')
 
 # список пользовательских параметров ("shp" к ним приписывать не нужно)
 EXTRA_PARAMS = sorted(getattr(settings, 'ROBOKASSA_EXTRA_PARAMS', []))

@@ -4,7 +4,13 @@ from django.conf.urls import url
 
 from . import views
 
+
 urlpatterns = [
+    url(
+          r'^proceed_to_payment/$',
+          views.proceed_to_payment,
+          name='proceed_to_payment'
+    ),
     url(
           r'^result/$',
           views.receive_result,

@@ -1,7 +1,6 @@
 #coding: utf-8
 
 from django.http import HttpResponse
-import logging
 from django.views.decorators.csrf import csrf_exempt
 
 from robokassa.conf import USE_POST, SUCCESS_URL, FAILURE_URL
@@ -10,11 +9,8 @@ from robokassa.signals import result_received, success_page_visited, fail_page_v
 
 from .handlers import  *
 from django.shortcuts import redirect
-from app.functions import loggingData
 
 from django.utils import timezone
-
-
 
 def _unpack(data):
     return {name: data[name] for name in data}
@@ -30,11 +26,17 @@ def proceed_to_payment(request):
         url = handler.get_redirect_url()
 
         return HttpResponse(url)
-        # {'username': 'comandos111', 'password': 'comandos111', 'site': 'minecraft', 'OutSum': '5', 'InvDesc': 'Кредиты', 'Email': 'shiningfinger @ list.ru'}
 
+
+# Функция, вызываемая, когда robokassa сообщает об
+# успешном пополнение счёта пользователем. Предварительно,
+# перед перенаправлением на страницу успешной оплаты, она 
+# сохраняет данные об успешной оплате в модель SuccessNotification.
+# При успешном создание объекта, активируется сигнал result_received,
+# который может передать успешное уведомление и остальные данные в функцию,
+# чтобы присвоить их модели пользователя. 
 @csrf_exempt
 def receive_result(request):
-    """ обработчик для ResultURL. """
     data = _unpack(request.POST if USE_POST else request.GET)
 
     id, sum = int(data['InvId']), data['OutSum']
@@ -52,10 +54,17 @@ def receive_result(request):
         OutSum=int(sum),
         extra=handler.extra_params()
     )
-    # extra = data.extra_params()
+    
     return HttpResponse('OK%s' % id)
 
-
+# Задействуются, когда робокасса перенаправляет пользователя
+# на страницу сайта успешной оплаты. Функция получает данные,
+# создаёт обработчик события успешной оплаты, отправляя его 
+# в сигнал, вместе с уникальныйм идентификаторы заказа и суммой
+# оплаты, обрабатываемые в функции, вызваемой при получение сигнала.
+# После перенаправляет на SUCCESS_URL, определённый в настройках приложения,
+# тождественный successUrl в компонение SuccessPaymentRoute, ловащий этот
+# url и перенаправляющий на указанный путь. 
 @csrf_exempt
 def success(request):
     """ обработчик для SuccessURL """
@@ -96,5 +105,4 @@ def fail(request):
         extra = handler.extra_params())
 
     return redirect(FAILURE_URL)
-
 

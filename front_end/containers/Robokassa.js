@@ -74,8 +74,9 @@ class Robokassa extends Component {
 
 		return (
 			<div className='replanishBalance'>
-				<Title block='replanishBalance'
-					text='Пополнить баланс' />
+				<h2 className='replanishBalance__title'>
+					Пополнить баланс
+				</h2>
 				<p className='replanishBlance__description'>
 					{replanishCost}
 				</p> 

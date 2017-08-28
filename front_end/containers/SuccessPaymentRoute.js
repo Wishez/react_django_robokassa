@@ -14,6 +14,8 @@ class SuccessPaymentRoute extends Component {
 	 * получения данных о платеже пользователя.
 	 * username: Имя пользователя, для извлечения из его модели
 	 * данных о платеже
+	 * onLoad: можно передать функцию, которая будет что-нибудь делать
+	 * при загрузке компонента.
 	 */
 	static PropTypes = {
 		redirectPath: PropTypes.string.isRequired,
@@ -28,13 +30,17 @@ class SuccessPaymentRoute extends Component {
 	componentDidMount() {
 		const { dispatch, user_id, username, getUserDataUrl, onLoad } = this.props;
 
-		if (onLoad) onLoad();
 
 		const data = {
 			username: username,
 			user_id: user_id
 		};
+		
+		if (onLoad) 
+			onLoad();
+		
 		dispatch(getSuccessPaymentData(data, getUserDataUrl));
+		
 	}
 
 	render() {

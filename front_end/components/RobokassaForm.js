@@ -1,14 +1,13 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
-import { Button } from 'semantic-ui-react';
 import RenderController from './RenderController';
 
 const RobokassaForm = ({
 	submitReplanishBalance,
 	handleSubmit,
 	robokassaMessage,
-	isRedirecting,
-	onChangeReplanishCost
+	onChangeReplanishCost,
+	isRedirecting
 }) => (
 	<form id='replanishBalanceForm'
 		onSubmit={handleSubmit(submitReplanishBalance.bind(this))}
@@ -19,7 +18,7 @@ const RobokassaForm = ({
 			min='1'
 			max='1000000'
 			block='replanishBalanceFormController'
-			placeholder='Количество кредитов'
+			placeholder='Сумма'
 			onChange={onChangeReplanishCost}
 			maxLength='17'
 			id='replanishBalanceInput'
@@ -27,10 +26,9 @@ const RobokassaForm = ({
 		{robokassaMessage ? 
 			<strong className='formError'>{robokassaMessage}</strong> : ''}
 		<br />
-	 	<Button loading={isRedirecting}
-	 		content='Пополнить'
-	 		className='replanishBalanceForm__button submit' 
-	 	/>	
+	 	<button className='replanishBalanceForm__button submit'>
+	 		Пополнить
+	 	<button/>	
 	 </form>
 );
 

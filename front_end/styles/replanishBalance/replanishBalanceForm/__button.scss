@@ -1,0 +1,6 @@
+.replanishBalanceForm__button {
+	@extend .logInFormButtons__button;
+	@extend .logInFormButtons__button--submit;
+	float: none;
+	margin-top: 0 !important;
+}

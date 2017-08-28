@@ -15,12 +15,10 @@ const proceedToPayment = (
 	robokassaMessage
 });
 
-const failurePayment = (
-	data,
+export const failurePayment = (
 	robokassaMessage
 ) => ({
 	type: FAILURE_PAYNMENT,
-	data,
 	robokassaMessage
 });
 
@@ -34,7 +32,7 @@ const successPayment = (
 });
 // 
 export const getSuccessPaymentData = (data, url) => dispatch => {
-	console.log(data);
+	
 	customAjaxRequest({
 		url: url, // is getUserDataUrl
 		data: data,
@@ -55,6 +53,7 @@ export const getSuccessPaymentData = (data, url) => dispatch => {
 		}
 	});
 };
+
 // Делает запрос к серверу и переводит пользователя на страницу
 // оплаты платёжного агрегатор ー robokassa. Перевод пользователя
 // происходит в django приложение robokassa. 

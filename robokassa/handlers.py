@@ -105,11 +105,12 @@ class RobokassaHandler(BaseRobokassaHandler):
         if TEST_MODE:
             self.isTest = 1
         else:
-            self.isTest = ''
+            self.isTest = 0
+        # Для тестирования
+        # from robokassa.handlers import RobokassaHandler
+        # r = RobokassaHandler(**{"OutSum": 200, "InvDesc":'Item', "InvId":0, "Email":'shiningfinger@list.ru', "username":'commandos'})
+        # r.get_redirect_url()
 
-            # r = RobokassaHandler(**{"OutSum": 200, "InvDesc":'Item', "InvId":0, "Email":'shiningfinger@list.ru', "username":'commandos'})
-            # r.get_redirect_url()
-    # MerchantLogin OutSum InvDesc InvId SignatureValue
     def get_redirect_url(self):
         """ Получить URL с GET-параметрами, определёнными при создание объекта обработчика
         данных робокассы(RobokassaHandler), внутри функции обработки формы оплаты.
@@ -119,11 +120,11 @@ class RobokassaHandler(BaseRobokassaHandler):
 
         def _initial(name):
             value = getattr(self, name)
-            if value:
+            if value is not None or value is not '':
+                print('got %s, %s' % (name, value))
                 return (name, value,)
             return ''
-
-        standart_part = urlencode([
+        array = [
             _initial('MerchantLogin'),
             _initial('OutSum'),
             _initial('InvId'),
@@ -132,7 +133,10 @@ class RobokassaHandler(BaseRobokassaHandler):
             _initial('Email'),
             _initial('Culture'),
             _initial('isTest')
-        ])
+        ]
+
+        print(array)
+        standart_part = urlencode(array)
 
         query_string = self._append_extra_part_to_query_string(standart_part)
 
@@ -171,9 +175,9 @@ class ResultURLHandler(BaseRobokassaHandler):
         try:
             signature = getattr(self, 'SignatureValue')
             if signature != self._get_signature():
-                raise
+                return 'Полученное уведомление неправильно.'
         except KeyError:
-            raise
+            return 'От робокассы не было предварительного уведомления.'
 
         return True
 
@@ -196,7 +200,7 @@ class SuccessHandler(ResultURLHandler):
 
         if STRICT_CHECK:
             if not SuccessNotification.objects.filter(InvId=data['InvId']):
-                raise # forms.ValidationError(u'От ROBOKASSA не было предварительного уведомления')
+                return False
         return True
 
 class FailureHandler(ResultURLHandler):
@@ -204,3 +208,8 @@ class FailureHandler(ResultURLHandler):
 
     def __init__(self, OutSum, SignatureValue='', InvId='', **kwargs):
         ResultURLHandler.__init__(self, OutSum, InvId, SignatureValue, **kwargs)
+
+    def _get_signature_string(self):
+        _val = lambda name: getattr(self, name)
+        standard_part = ':'.join([_val('OutSum'), _val('InvId'), PASSWORD1])
+        return self._append_extra_part_to_hash(standard_part)
